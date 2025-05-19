@@ -8,14 +8,16 @@
 
 </head>
 <style>
-*{margin: 0;padding: 0;box-sizing: border-box;}    
+*{margin: 0;padding: 0;box-sizing: border-box;}  
+body{min-height: 100vh;background: #000;}  
 button{border: none; outline:none}
 #game{
     width: 100%;
     max-width: 747px;
     background: black;
     margin: 0 auto;
-    aspect-ratio: 1/1.6;
+    height: 500px;
+    
     max-height: 100vh;
     display: flex;
     position: relative;
@@ -47,13 +49,28 @@ button{border: none; outline:none}
 #game .line .btn{
     position: absolute;
     width: 100%;
-    height: 40px;
+    height: 20px;
     border-top: 2px solid #ddd;
     border-bottom: 2px solid #ddd;
     left: 0;
     right: 0;
-    bottom: 40px;
+    bottom: 20px;
+    transition: 0.7s;
 }
+#game .line .btn.click{
+    opacity: 0.5;
+}
+#game .line span{
+    color: #000;
+    font-weight: 700;
+    display: none;
+}
+@media (max-width:747px) {
+    #game .line span{
+        display: none; 
+    }   
+}
+
 .line[data-num="1"] .btn {
     background: linear-gradient(to top, #00f, #0ff);
 }
@@ -74,7 +91,7 @@ button{border: none; outline:none}
     opacity: 0.7;
     position: absolute;    
     width: 100%;
-    height: 40px;
+    height: 20px;
     top: 0%;
     transform: translateY(0);
     pointer-events: none;
@@ -124,19 +141,19 @@ button{border: none; outline:none}
 <body>
     <div id="game">
         <div class="line" data-num="1">
-            <button type="button" class="btn"></button>
+            <button type="button" class="btn"><span class="btn_A pc">A</span></button>
         </div>
         <div class="line" data-num="2">
-            <button type="button" class="btn"></button>
+            <button type="button" class="btn"><span class="btn_S pc">S</span></button>
         </div>
         <div class="line" data-num="3">
-            <button type="button" class="btn"></button>
+            <button type="button" class="btn"><span class="btn_D pc">D</span></button>
         </div>
         <div class="line" data-num="4">
-            <button type="button" class="btn"></button>
+            <button type="button" class="btn"><span class="btn_F pc">F</span></button>
         </div>
         <div class="line" data-num="5">
-            <button type="button" class="btn"></button>
+            <button type="button" class="btn"><span class="btn_G pc">G</span></button>
         </div>        
         <div class="scroe">
             <p class="combo">0</p>
@@ -152,7 +169,6 @@ button{border: none; outline:none}
             const randomLine = Math.floor(Math.random() * 5); // 0~4
             const line = document.querySelectorAll('.line')[randomLine];
 
-            // 👉 이미 노트가 있으면 생성하지 않음
             if (line.querySelector('.note')) return;
 
             const note = document.createElement('div');
@@ -178,9 +194,12 @@ button{border: none; outline:none}
         let combo = 0;
         let perfect = 0;
         function buttonClick(){
-            const buttonY = 80;    
+            const buttonY = 40;    
             document.querySelectorAll('.btn').forEach((btn)=>{
                 btn.addEventListener('click',(e)=>{
+                    const clickToggle = ()=>{e.target.classList.toggle('click')}  ;
+                    clickToggle();
+                    setTimeout(()=>{clickToggle()},700)
                     const lineClicked = e.target.closest('.line');
                     const note = lineClicked.querySelector('.note');
                     const style = getComputedStyle(note);
@@ -190,26 +209,28 @@ button{border: none; outline:none}
                     const parentHeight = line.clientHeight; // 라인 높이값
                     const standard = parentHeight-buttonY;  // 버튼의 위치값
                     const match = Math.abs(standard - currentY);    // 버튼의 위치값에서 현재 떨어지고있는 노트의 Y값을 차감한 수치(0에 가까울수록 perfect)          
-                    console.log(match);
                     let text;
-                    if(match>40){   // 40보다 큰 상태인 경우 miss
+                    if(match>20){   // 40보다 큰 상태인 경우 miss
                         combo = 0;
                         perfect = 0;          
                         text = 'MISS'         
-                    }else if(match<40 && match>10){ // 40 이하인 경우 combo
+                    }else if(match<20 && match>10){ // 40 이하인 경우 combo
                         combo = combo + 1;
                         perfect = 0;
                         text = 'Combo'
-                    }else if(match<10|| match==40){ // 10보다 작은 경우 perfect
+                    }else if(match<10|| match==20){ // 10보다 작은 경우 perfect
                         combo = combo + 1;
                         perfect = perfect + 1;
                     }
                     document.querySelector('.combo').textContent = combo;
                     document.querySelector('.perfect').textContent = perfect;
-                   
+                    alert(match);
                 })                                
             })
         }
+        // function keyboardClick(){
+
+        // }
         buttonClick();
     };
     game();
