@@ -137,6 +137,43 @@ button{border: none; outline:none}
     text-shadow: 0 0 3px #ff00ff;
     margin: 0;
 }
+.judgement {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 48px;
+  font-weight: bold;
+
+  opacity: 0;
+  pointer-events: none;
+  z-index: 9999;
+  transition:  opacity 0.5s;  
+}
+.judgement.show{
+    opacity: 1;
+}
+.judgement.combo{
+    color: #00ffff; /* 밝은 사이안 (기본 판정 텍스트 컬러) */
+     text-shadow:
+    0 0 10px #00ffff,
+    0 0 20px #00ffff,
+    0 0 30px #00ffff;
+}
+.judgement.perfect{
+    color: #cccccc;
+    text-shadow:
+    0 0 5px #ffffff,
+    0 0 10px #bbbbbb;
+}
+.judgement.miss{
+    color: #ff3b3b;
+    text-shadow:
+    0 0 8px #ff0000,
+    0 0 16px #ff0000,
+    0 0 24px #990000;
+}
+
 </style>
 <body>
     <div id="game">
@@ -159,7 +196,7 @@ button{border: none; outline:none}
             <p class="combo">0</p>
             <p class="perfect">0</p>            
         </div>
-        
+        <div class="judgement"></div>
             
         
     </div>    
@@ -208,23 +245,35 @@ button{border: none; outline:none}
                     const line = document.querySelector('.line');
                     const parentHeight = line.clientHeight; // 라인 높이값
                     const standard = parentHeight-buttonY;  // 버튼의 위치값
-                    const match = Math.abs(standard - currentY);    // 버튼의 위치값에서 현재 떨어지고있는 노트의 Y값을 차감한 수치(0에 가까울수록 perfect)          
-                    let text;
+                    const match = Math.abs(standard - currentY);    // 버튼의 위치값에서 현재 떨어지고있는 노트의 Y값을 차감한 수치(0에 가까울수록 perfect)  
+                    const judgementView = document.querySelector('.judgement');
+                    let judgement;
                     if(match>20){   // 40보다 큰 상태인 경우 miss
                         combo = 0;
                         perfect = 0;          
-                        text = 'MISS'         
+                        judgement = 'MISS'         
                     }else if(match<20 && match>10){ // 40 이하인 경우 combo
                         combo = combo + 1;
                         perfect = 0;
-                        text = 'Combo'
+                        judgement = 'COMBO'
                     }else if(match<10|| match==20){ // 10보다 작은 경우 perfect
                         combo = combo + 1;
                         perfect = perfect + 1;
+                        judgement = 'PERFECT'
                     }
-                    document.querySelector('.combo').textContent = combo;
-                    document.querySelector('.perfect').textContent = perfect;
-                    alert(match);
+                    document.querySelector('.combo').textContent = combo + ' combo';
+                    document.querySelector('.perfect').textContent = perfect + '  perfect';
+                    //alert(match);
+                    judgementView.textContent=judgement;
+                    function judgeToggle(){
+                        judgementView.classList.toggle('show');
+                        judgementView.classList.remove('miss', 'perfect', 'combo');
+                    }
+
+                    judgeToggle();
+                    judgementView.classList.add(judgement.toLowerCase());                    
+                    setTimeout(()=>{judgeToggle()},500)
+            
                 })                                
             })
         }
